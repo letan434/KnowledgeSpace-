@@ -1,0 +1,19 @@
+<p>users lists!</p>
+<ul>
+    <li *ngFor="let user of users$ | async">{{user.userName}}</li>
+</ul>
+<div class="animated fadeIn">
+    <p-panel #pnl [style]="{'magin-bottom':'10px'}">
+        <p-header>
+                <div class="ui-g-6">
+                    <button appPermission appFunction="SYSTEM_USER" appAction="CREATE" pButton type="button" label="Thêm"
+                            icon="fa fa-plus" (click)="showAddModal()"></button>
+                    <button appPermission appFunction="SYSTEM_USER" appAction="CREATE" pButton type="button" label="Thêm"
+                            icon="fa fa-plus" (click)="showAddModal()"></button>
+            </div>
+        </p-header>
+    </p-panel>
+    <p-panel #pnlRole >
+
+    </p-panel>
+</div>
