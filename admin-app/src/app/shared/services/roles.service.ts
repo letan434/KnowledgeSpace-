@@ -37,5 +37,11 @@ export class RolesService extends BaseService {
     return this.http.delete(`${environment.apiUrl}/api/roles/${id}`, {headers: this._shareHeaders})
       .pipe(catchError(this.handleError));
   }
+  getAll() {
+    return this.http.get<Role[]>(`${environment.apiUrl}/api/roles`, { headers: this._shareHeaders })
+      .pipe(map((response: Role[]) => {
+        return response;
+      }), catchError(this.handleError));
+  }
 
 }
