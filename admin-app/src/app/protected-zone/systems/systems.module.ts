@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FunctionsComponent } from './functions/functions.component';
 import { UsersComponent } from './users/users.component';
 import { RolesComponent } from './roles/roles.component';
@@ -19,9 +19,17 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { UsersDetailComponent } from './users/users-detail/users-detail.component';
 import { RolesAssignComponent } from './users/roles-assign/roles-assign.component';
+import { KeyFilterModule } from 'primeng/keyfilter';
+import { CalendarModule } from 'primeng/calendar';
+import { CheckboxModule } from 'primeng/checkbox';
+import { CommandsAssignComponent } from './functions/commands-assign/commands-assign.component';
+import { FunctionDetailComponent } from './functions/function-detail/function-detail.component';
+import { TreeTableModule } from 'primeng/treetable';
+import { DropdownModule } from 'primeng/dropdown';
+
 @NgModule({
   declarations: [FunctionsComponent, UsersComponent, RolesComponent, PermissionsComponent,
-    RolesDetailComponent, UsersDetailComponent, RolesAssignComponent],
+    RolesDetailComponent, UsersDetailComponent, RolesAssignComponent, CommandsAssignComponent, FunctionDetailComponent],
   imports: [
     CommonModule,
     SystemsRoutingModule,
@@ -34,12 +42,18 @@ import { RolesAssignComponent } from './users/roles-assign/roles-assign.componen
     ReactiveFormsModule,
     ProgressSpinnerModule,
     ValidationMessageModule,
+    KeyFilterModule,
+    CalendarModule,
+    CheckboxModule,
+    TreeTableModule,
+    DropdownModule,
     ModalModule.forRoot(),
     InputTextModule
   ],
   providers: [
     NotificationService,
-    BsModalService
+    BsModalService,
+    DatePipe
   ]
 })
 export class SystemsModule { }

@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KnowledgeSpace.BackendServer.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20201029185121_AddIconToFunction")]
-    partial class AddIconToFunction
+    [Migration("20201205094626_DbInitial")]
+    partial class DbInitial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
