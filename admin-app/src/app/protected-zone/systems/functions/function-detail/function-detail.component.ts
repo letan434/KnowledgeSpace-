@@ -1,7 +1,7 @@
-import { Component, EventEmitter, OnInit } from '@angular/core';
+import { Component, OnInit, EventEmitter } from '@angular/core';
+import { UtilitiesService, NotificationService, FunctionService } from '@app/shared/services';
 import { BsModalRef } from 'ngx-bootstrap/modal';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { FunctionService, NotificationService } from '@app/shared/services';
+import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { MessageConstants } from '@app/shared/constants';
 
 @Component({
@@ -10,34 +10,38 @@ import { MessageConstants } from '@app/shared/constants';
   styleUrls: ['./function-detail.component.scss']
 })
 export class FunctionDetailComponent implements OnInit {
-  public dialogTitle: string;
+
+  constructor(private utilityService: UtilitiesService,
+              public bsModalRef: BsModalRef,
+              private functionsService: FunctionService,
+              private notificationService: NotificationService,
+              private fb: FormBuilder) {
+  }
+  public blockedPanel = false;
   public entityForm: FormGroup;
+  public dialogTitle: string;
   public entityId: string;
-  public blockPanel = false;
   public btnDisabled = false;
-  constructor(
-    public bsModalRef: BsModalRef,
-    private functionService: FunctionService,
-    private notificationService: NotificationService,
-    private fb: FormBuilder
-  ) { }
+
   saved: EventEmitter<any> = new EventEmitter();
   public rootFunctions: any[] = [];
-  // validate
+
+  // Validate
   noSpecial: RegExp = /^[^<>*!_~]+$/;
   validation_messages = {
     'name': [
-      {type: 'required', message: 'ban phai nhap ten trang'},
-      {type: 'minlength', message: 'ban phai nhap it nhat 3 ky tu'},
-      {type: 'maxlength', message: 'ban khong duoc nhap qua 255 ky tu'}
+      { type: 'required', message: 'Bạn phải nhập tên trang' },
+      { type: 'minlength', message: 'Bạn phải nhập ít nhất 3 kí tự' },
+      { type: 'maxlength', message: 'Bạn không được nhập quá 255 kí tự' }
     ],
     'id': [
-      {type: 'required', message: 'ban phai nhap ma duy nhat'}
+      { type: 'required', message: 'Bạn phải nhập mã duy nhất' }
     ],
     'sortOrder': [
-      {type: 'required', message: 'ban phai nhap thu tu'}
+      { type: 'required', message: 'Bạn phải nhập thứ tự' }
     ]
   };
+
   ngOnInit() {
     this.entityForm = this.fb.group({
       'id': new FormControl('', Validators.required),
@@ -52,81 +56,92 @@ export class FunctionDetailComponent implements OnInit {
       'sortOrder': new FormControl(1, Validators.required)
     });
     if (this.entityId) {
-      this.dialogTitle = 'Cap nhat';
+      this.dialogTitle = 'Cập nhật';
       this.loadParents(this.entityId);
+      this.loadDetail(this.entityId);
+      this.entityForm.controls['id'].disable({ onlySelf: true });
+
+    } else {
+      this.loadParents(null);
+      this.dialogTitle = 'Thêm mới';
     }
   }
-  loadDetails(id) {
-    this.btnDisabled = true;
-    this.blockPanel = true;
-    this.functionService.getDetail(id).subscribe((response: any) => {
-      this.entityForm.setValue({
-        id: response.id,
-        parentId: response.parentId,
-        name: response.name,
-        url: response.url,
-        icon: response.icon,
-        sortOrder: response.sortOrder
-      });
-      setTimeout(() => {
-        this.blockPanel = false;
-        this.btnDisabled = false;
-      }, 1000);
 
-    }, error => {
-      setTimeout(() => {
-        this.blockPanel = false;
-        this.btnDisabled = false;
-      }, 1000);
-    });
+  loadDetail(id: any) {
+    this.btnDisabled = true;
+    this.blockedPanel = true;
+    this.functionsService.getDetail(id)
+      .subscribe((response: any) => {
+        this.entityForm.setValue({
+          id: response.id,
+          parentId: response.parentId,
+          name: response.name,
+          url: response.url,
+          icon: response.icon,
+          sortOrder: response.sortOrder
+        });
+        setTimeout(() => {
+          this.btnDisabled = false;
+          this.blockedPanel = false;
+        }, 1000);
+      }, error => {
+        setTimeout(() => {
+          this.btnDisabled = false;
+          this.blockedPanel = false;
+        }, 1000);
+      });
   }
+
   loadParents(id) {
-    this.functionService.getAllByParentId(id).subscribe((response: any[]) => {
-      this.rootFunctions = [];
-      response.forEach(element => {
-        this.rootFunctions.push({
-          value: element.id,
-          label: element.name
+    this.functionsService.getAllByParentId(id)
+      .subscribe((response: any) => {
+        this.rootFunctions = [];
+        response.forEach(element => {
+          this.rootFunctions.push({
+            value: element.id,
+            label: element.name
+          });
         });
       });
-    });
   }
+
   saveChange() {
     this.btnDisabled = true;
-    this.blockPanel = true;
+    this.blockedPanel = true;
     if (this.entityId) {
-      this.functionService.update(this.entityId, this.entityForm.getRawValue())
+      this.functionsService.update(this.entityId, this.entityForm.getRawValue())
         .subscribe(() => {
           this.notificationService.showSuccess(MessageConstants.UPDATED_OK_MSG);
           this.saved.emit(this.entityForm.value);
 
           setTimeout(() => {
             this.btnDisabled = false;
-            this.blockPanel = false;
+            this.blockedPanel = false;
           }, 1000);
         }, error => {
           setTimeout(() => {
             this.btnDisabled = false;
-            this.blockPanel = false;
+            this.blockedPanel = false;
           }, 1000);
         });
     } else {
-      this.functionService.add(this.entityForm.value)
+      this.functionsService.add(this.entityForm.value)
         .subscribe(() => {
 
           this.notificationService.showSuccess(MessageConstants.CREATED_OK_MSG);
           this.saved.emit(this.entityForm.value);
           setTimeout(() => {
             this.btnDisabled = false;
-            this.blockPanel = false;
+            this.blockedPanel = false;
           }, 1000);
 
         }, error => {
           setTimeout(() => {
             this.btnDisabled = false;
-            this.blockPanel = false;
+            this.blockedPanel = false;
           }, 1000);
         });
+
     }
   }
 

@@ -1,14 +1,12 @@
-<p>function-detail works!</p>
 <div class="modal-header">
-    <h4 class="modal-title pull-left">{{dialogTitle}}</h4>
-    <button type ="button" class="close pull-right" aria-label="Close" (click)="bsModalRef.hide()">
-        <span aria-hidden="true">&times;</span>
-    </button>
-
+<h4 class="modal-title pull-left">{{dialogTitle}}</h4>
+<button type="button" class="close pull-right" aria-label="Close" (click)="bsModalRef.hide()">
+    <span aria-hidden="true">&times;</span>
+</button>
 </div>
-<form class="form-check-label form-control" novalidate [formGroup]="entityForm" (ngSubmit)="saveChange()">
-    <div class="modal-body modal-scrollbar-measure">
-        <p-panel #pnl header="Thong tin" [toggleable]="true" [collapsed]="false" styleClass="m-b-10">
+<form class="form-horizontal form-label-left" novalidate [formGroup]="entityForm" (ngSubmit)="saveChange()">
+    <div class="modal-body div-scroll">
+        <p-panel #pnl header="Thông tin" [toggleable]="true" [collapsed]="false" styleClass="m-b-10">
             <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid">
                 <div class="ui-grid-row">
                     <div class="ui-grid-col-2">
@@ -92,12 +90,17 @@
                                                 [validationMessages]="validation_messages"></app-validation-message>
                     </div>
                 </div>
+
             </div>
-            <p-blockUI [target]="pnl" [blocked]="blockPanel">
+            <p-blockUI [target]="pnl" [blocked]="blockedPanel">
                 <p-progressSpinner [style]="{width: '100px', height: '100px', position:'absolute',top:'25%',left:'50%'}"
                                    strokeWidth="2" animationDuration=".5s"></p-progressSpinner>
             </p-blockUI>
         </p-panel>
-
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary" [disabled]="!entityForm.valid || btnDisabled">Lưu lại</button>
+        &nbsp;
+        <button type="button" class="btn btn-default" (click)="bsModalRef.hide()">Đóng</button>
     </div>
 </form>

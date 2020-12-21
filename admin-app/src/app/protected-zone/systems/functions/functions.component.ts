@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { TreeNode } from 'primeng/api/treenode';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { FunctionService, NotificationService, UtilitiesService } from '@app/shared/services';
@@ -6,14 +6,15 @@ import { MessageConstants } from '@app/shared/constants';
 import { FunctionDetailComponent } from './function-detail/function-detail.component';
 import { CommandsAssignComponent } from './commands-assign/commands-assign.component';
 import { CommandAssign } from '@app/shared/models';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-functions',
   templateUrl: './functions.component.html',
   styleUrls: ['./functions.component.css']
 })
-export class FunctionsComponent implements OnInit {
-
+export class FunctionsComponent implements OnInit, OnDestroy {
+  private subscription = new Subscription();
   public bsModalRef: BsModalRef;
   public blockedPanel = false;
   public blockedPanelCommand = false;
@@ -44,7 +45,7 @@ export class FunctionsComponent implements OnInit {
   }
   loadData(selectionId = null) {
     this.blockedPanel = true;
-    this.functionsService.getAll()
+    this.subscription.add(this.functionsService.getAll()
       .subscribe((response: any) => {
         const functionTree = this.utilitiesService.UnflatteringForTree(response);
         console.log(functionTree);
@@ -62,7 +63,7 @@ export class FunctionsComponent implements OnInit {
         setTimeout(() => { this.blockedPanel = false; }, 1000);
       }, error => {
         setTimeout(() => { this.blockedPanel = false; }, 1000);
-      });
+      }));
   }
 
   showAddModal() {
@@ -102,7 +103,7 @@ export class FunctionsComponent implements OnInit {
   }
   loadDataCommand() {
     this.blockedPanelCommand = true;
-    this.functionsService.getAllCommandsByFunctionId(this.selectedItems[0].id)
+    this.subscription.add(this.functionsService.getAllCommandsByFunctionId(this.selectedItems[0].id)
       .subscribe((response: any) => {
 
         this.commands = response;
@@ -112,7 +113,7 @@ export class FunctionsComponent implements OnInit {
         this.blockedPanelCommand = false;
       }, error => {
         this.blockedPanelCommand = false;
-      });
+      }));
   }
   addCommandsToFunction() {
     if (this.selectedItems.length === 0) {
@@ -129,11 +130,11 @@ export class FunctionsComponent implements OnInit {
         class: 'modal-lg',
         backdrop: 'static'
       });
-    this.bsModalRef.content.chosenEvent.subscribe((response: any[]) => {
+    this.subscription.add(this.bsModalRef.content.chosenEvent.subscribe((response: any[]) => {
       this.bsModalRef.hide();
       this.loadData();
       this.selectedItems = [];
-    });
+    }));
   }
 
   removeCommands() {
@@ -192,6 +193,9 @@ export class FunctionsComponent implements OnInit {
     if (this.selectedItems.length === 1 && this.showCommandGrid) {
       this.loadDataCommand();
     }
+  }
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 }
 
