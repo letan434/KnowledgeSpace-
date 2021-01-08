@@ -1,5 +1,5 @@
 import { Permission } from '@app/shared/models/permission.model';
 
 export class PermissionUpdateRequest {
-  permission: Permission[];
+  permissions: Permission[];
 }

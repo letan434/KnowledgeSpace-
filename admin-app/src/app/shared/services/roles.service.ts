@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BaseService } from './base.service';
-import { Role } from '../models/role.model';
 import { environment } from '../../../environments/environment';
 import { catchError, map } from 'rxjs/operators';
-import { Pagination } from '../models/pagination.model';
+import { Pagination, Permission, Role } from '@app/shared/models';
 
 @Injectable({
   providedIn: 'root'
@@ -42,6 +41,10 @@ export class RolesService extends BaseService {
       .pipe(map((response: Role[]) => {
         return response;
       }), catchError(this.handleError));
+  }
+  getRolePermissions(roleId) {
+    return this.http.get<Permission[]>(`${environment.apiUrl}/api/roles/${roleId}/permissions`, {headers: this._shareHeaders})
+      .pipe(catchError(this.handleError));
   }
 
 }

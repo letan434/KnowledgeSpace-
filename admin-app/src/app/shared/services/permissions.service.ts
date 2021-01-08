@@ -15,11 +15,11 @@ export class PermissionsService extends BaseService {
     this._sharedHeaders = this._sharedHeaders.set('Content-Type', 'application/json');
   }
   save(roleId: string, request: PermissionUpdateRequest) {
-    return this.http.put(`${environment.apiUrl}/api/role/${roleId}/permissons`, JSON.stringify(request), {headers: this._sharedHeaders})
+    return this.http.put(`${environment.apiUrl}/api/roles/${roleId}/permissions`, JSON.stringify(request), {headers: this._sharedHeaders})
       .pipe(catchError(this.handleError));
   }
-  getFunctionWithCommand() {
-    return this.http.get<PermissionScreen>(`${environment.apiUrl}/api/permissons`,{headers: this._sharedHeaders})
+  getFunctionWithCommands() {
+    return this.http.get<PermissionScreen>(`${environment.apiUrl}/api/permissions`, { headers: this._sharedHeaders })
       .pipe(catchError(this.handleError));
   }
 }
