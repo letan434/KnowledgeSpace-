@@ -9,7 +9,6 @@ import { AppComponent } from './app.component';
 import { AuthGuard } from './shared';
 import { AuthInterceptor } from './shared/intercepters/auth.intercepter';
 import { LanguageTranslationModule } from './shared/modules/language-translation/language-translation.module';
-
 @NgModule({
     imports: [
         CommonModule,

@@ -26,6 +26,7 @@ import { CommandsAssignComponent } from './functions/commands-assign/commands-as
 import { FunctionDetailComponent } from './functions/function-detail/function-detail.component';
 import { TreeTableModule } from 'primeng/treetable';
 import { DropdownModule } from 'primeng/dropdown';
+import { SharedDirectivesModule } from '@app/shared/directives/shared-directives.module';
 
 @NgModule({
   declarations: [FunctionsComponent, UsersComponent, RolesComponent, PermissionsComponent,
@@ -47,6 +48,7 @@ import { DropdownModule } from 'primeng/dropdown';
     CheckboxModule,
     TreeTableModule,
     DropdownModule,
+    SharedDirectivesModule,
     ModalModule.forRoot(),
     InputTextModule
   ],

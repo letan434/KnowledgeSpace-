@@ -8,6 +8,7 @@ using KnowledgeSpace.ViewModels.Systems;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -113,7 +114,7 @@ namespace KnowledgeSpace.BackendServer.Controllers
         [HttpPut("{id}")]
         [ClaimRequirement(FunctionCode.SYSTEM_ROLE, CommandCode.UPDATE)]
         [ApiValidationFilter]
-        public async Task<IActionResult> PutRole(string id, [FromBody]RoleCreateRequest roleVm)
+        public async Task<IActionResult> PutRole(string id, [FromBody] RoleCreateRequest roleVm)
         {
             if (id != roleVm.Id)
                 return BadRequest(new ApiBadRequestResponse("Role id not match"));
@@ -185,18 +186,65 @@ namespace KnowledgeSpace.BackendServer.Controllers
             var newPermissions = new List<Permission>();
             foreach (var p in request.Permissions)
             {
-                newPermissions.Add(new Permission(p.FunctionId, roleId, p.CommandId));
+                newPermissions.Add(new Permission(p.FunctionId, p.RoleId, p.CommandId));
             }
 
             var existingPermissions = _context.Permissions.Where(x => x.RoleId == roleId);
             _context.Permissions.RemoveRange(existingPermissions);
-            _context.Permissions.AddRange(newPermissions);
+            _context.Permissions.AddRange(newPermissions.Distinct(new MyPermissionComparer()));
             var result = await _context.SaveChangesAsync();
             if (result > 0)
             {
                 return NoContent();
             }
             return BadRequest(new ApiBadRequestResponse("Save permission failed"));
+        }
+        [HttpDelete("{roleId}/permissons")]
+        [ClaimRequirement(FunctionCode.SYSTEM_PERMISSION, CommandCode.VIEW)]
+        [ApiValidationFilter]
+        public async Task<IActionResult> DeletePermissionByRoleId(string roleId)
+        {
+            var permission = _context.Permissions.Where(x => x.RoleId == roleId);
+            _context.Permissions.RemoveRange(permission);
+            var result = await _context.SaveChangesAsync();
+            if (result > 0)
+            {
+                return NoContent();
+            }
+            return BadRequest(new ApiBadRequestResponse("not delete"));
+        }
+
+
+    }
+
+    internal class MyPermissionComparer : IEqualityComparer<Permission>
+    {
+        // Items are equal if their ids are equal.
+        public bool Equals(Permission x, Permission y)
+        {
+            // Check whether the compared objects reference the same data.
+            if (Object.ReferenceEquals(x, y)) return true;
+
+            // Check whether any of the compared objects is null.
+            if (Object.ReferenceEquals(x, null) || Object.ReferenceEquals(y, null))
+                return false;
+
+            //Check whether the items properties are equal.
+            return x.CommandId == y.CommandId && x.FunctionId == x.FunctionId && x.RoleId == x.RoleId;
+        }
+
+        // If Equals() returns true for a pair of objects
+        // then GetHashCode() must return the same value for these objects.
+
+        public int GetHashCode(Permission permission)
+        {
+            //Check whether the object is null
+            if (Object.ReferenceEquals(permission, null)) return 0;
+
+            //Get hash code for the ID field.
+            int hashProductId = (permission.CommandId + permission.FunctionId + permission.RoleId).GetHashCode();
+
+            return hashProductId;
         }
     }
 }
