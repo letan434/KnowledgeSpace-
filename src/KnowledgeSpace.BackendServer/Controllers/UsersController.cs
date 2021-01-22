@@ -142,6 +142,7 @@ namespace KnowledgeSpace.BackendServer.Controllers
             user.FirstName = request.FirstName;
             user.LastName = request.LastName;
             user.Dob = DateTime.Parse(request.Dob);
+            user.LastModifiedDate = DateTime.Now;
 
             var result = await _userManager.UpdateAsync(user);
 

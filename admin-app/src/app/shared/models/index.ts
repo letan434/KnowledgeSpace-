@@ -9,3 +9,5 @@ export * from './command.model';
 export * from './permission-screen.model';
 export * from './permission.model';
 export * from './permission-update-request';
+export * from './category.model';
+export * from './knowledge-base.model';

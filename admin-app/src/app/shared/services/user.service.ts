@@ -32,7 +32,7 @@ export class UsersService extends BaseService {
           .pipe(catchError(this.handleError));
     }
     update(id: string, enity: User) {
-        return this.http.post(`${environment.apiUrl}/api/users/${id}`, JSON.stringify(enity), { headers: this._shareHeaders })
+        return this.http.put(`${environment.apiUrl}/api/users/${id}`, JSON.stringify(enity), { headers: this._shareHeaders })
           .pipe(catchError(this.handleError));
     }
     getAllPaging(filter, pageIndex, pageSize) {

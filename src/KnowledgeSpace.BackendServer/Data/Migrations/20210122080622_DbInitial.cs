@@ -67,7 +67,9 @@ namespace KnowledgeSpace.BackendServer.Data.Migrations
                     Dob = table.Column<DateTime>(nullable: false),
                     NumberOfKnowledgeBases = table.Column<int>(nullable: true),
                     NumberOfVotes = table.Column<int>(nullable: true),
-                    NumberOfReports = table.Column<int>(nullable: true)
+                    NumberOfReports = table.Column<int>(nullable: true),
+                    CreateDate = table.Column<DateTime>(nullable: false),
+                    LastModifiedDate = table.Column<DateTime>(nullable: true)
                 },
                 constraints: table =>
                 {
