@@ -7,7 +7,7 @@
                 <button appPermission appFunction="SYSTEM_FUNCTION" appAction="DELETE" pButton type="button" label="Xóa"
                         icon="fa fa-trash" class="ui-button-danger" *ngIf="selectedItems.length > 0" (click)="deleteItems()"></button>
                 <button appPermission appFunction="SYSTEM_FUNCTION" appAction="UPDATE" pButton type="button" label="Sửa"
-                        icon="fa fa-edit" class="ui-button-warning" *ngIf="selectedItems.length === 1"
+                        icon="fa fa-edit" class="ui-button-warning" *ngIf="selectedItems.length== 1"
                         (click)="showEditModal()"></button>
             </div>
             <div class="ui-g-4">
@@ -25,7 +25,7 @@
                         <p-treeTableHeaderCheckbox></p-treeTableHeaderCheckbox>
                     </th>
                     <th>Tên</th>
-                    <th class="ui-helper-hidden">Mã</th>
+                    <th class="pgrid-hidden-xs">Mã</th>
                     <th>Thứ tự</th>
                 </tr>
             </ng-template>
@@ -59,7 +59,7 @@
             <div class="pcol-12">
                 <button pButton appPermission appFunction="SYSTEM_FUNCTION" appAction="UPDATE" type="button" label="Thêm hành động" icon="fa fa-plus" *ngIf="selectedItems.length == 1"
                         (click)="addCommandsToFunction()"></button>
-                <button pButton pButton type="button" appFunction="SYSTEM_FUNCTION" appAction="UPDATE" label="Xóa hành động" icon="fa fa-trash" class="ui-button-danger"
+                <button pButton type="button" appFunction="SYSTEM_FUNCTION" appAction="UPDATE" label="Xóa hành động" icon="fa fa-trash" class="ui-button-danger"
                         *ngIf="selectedCommandItems.length > 0" (click)="removeCommands()"></button>
             </div>
         </p-header>

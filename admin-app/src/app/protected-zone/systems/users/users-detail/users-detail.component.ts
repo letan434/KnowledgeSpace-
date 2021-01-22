@@ -1,16 +1,17 @@
-import { Component, OnInit, EventEmitter } from '@angular/core';
+import { Component, OnInit, EventEmitter, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { MessageConstants } from '@app/shared/constants';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import { NotificationService, UsersService } from '@app/shared/services';
 import { DatePipe } from '@angular/common';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-users-detail',
   templateUrl: './users-detail.component.html',
   styleUrls: ['./users-detail.component.scss']
 })
-export class UsersDetailComponent implements OnInit {
+export class UsersDetailComponent implements OnInit, OnDestroy {
 
   constructor(
     public bsModalRef: BsModalRef,
@@ -20,6 +21,7 @@ export class UsersDetailComponent implements OnInit {
     private datePipe: DatePipe
   ) {
   }
+  private subscription = new Subscription();
   public blockedPanel = false;
   public myRoles: string[] = [];
   public entityForm: FormGroup;
@@ -119,7 +121,7 @@ export class UsersDetailComponent implements OnInit {
   loadUserDetail(id: any) {
     this.btnDisabled = true;
     this.blockedPanel = true;
-    this.usersService.getDetail(id)
+    this.subscription.add(this.usersService.getDetail(id)
       .subscribe((response: any) => {
         const dob: Date = new Date(response.dob);
         this.entityForm.setValue({
@@ -141,7 +143,7 @@ export class UsersDetailComponent implements OnInit {
           this.btnDisabled = false;
           this.blockedPanel = false;
         }, 1000);
-      });
+      }));
   }
 
 
@@ -151,7 +153,7 @@ export class UsersDetailComponent implements OnInit {
     const rawValues = this.entityForm.getRawValue();
     rawValues.dob = this.datePipe.transform(this.entityForm.controls['dob'].value, 'MM/dd/yyyy');
     if (this.entityId) {
-      this.usersService.update(this.entityId, rawValues)
+      this.subscription.add(this.usersService.update(this.entityId, rawValues)
         .subscribe(() => {
           this.notificationService.showSuccess(MessageConstants.UPDATED_OK_MSG);
 
@@ -166,9 +168,9 @@ export class UsersDetailComponent implements OnInit {
             this.btnDisabled = false;
             this.blockedPanel = false;
           }, 1000);
-        });
+        }));
     } else {
-      this.usersService.add(rawValues)
+      this.subscription.add(this.usersService.add(rawValues)
         .subscribe(() => {
           this.notificationService.showSuccess(MessageConstants.CREATED_OK_MSG);
           this.saved.emit(this.entityForm.value);
@@ -184,8 +186,11 @@ export class UsersDetailComponent implements OnInit {
             this.btnDisabled = false;
             this.blockedPanel = false;
           }, 1000);
-        });
+        }));
 
     }
+  }
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 }

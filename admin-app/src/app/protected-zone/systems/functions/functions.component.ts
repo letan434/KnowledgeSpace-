@@ -3,9 +3,9 @@ import { TreeNode } from 'primeng/api/treenode';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { FunctionService, NotificationService, UtilitiesService } from '@app/shared/services';
 import { MessageConstants } from '@app/shared/constants';
-import { FunctionDetailComponent } from './function-detail/function-detail.component';
-import { CommandsAssignComponent } from './commands-assign/commands-assign.component';
 import { CommandAssign } from '@app/shared/models';
+import { CommandsAssignComponent } from './commands-assign/commands-assign.component';
+import { FunctionDetailComponent } from '@app/protected-zone/systems/functions/function-detail/function-detail.component';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -22,6 +22,8 @@ export class FunctionsComponent implements OnInit, OnDestroy {
   // -----------------Function-----------------
   public items: TreeNode[] = [];
   public selectedItems = [];
+
+  // ---------------Command------------------------------
   public commands: any[] = [];
   public selectedCommandItems = [];
 
@@ -31,6 +33,11 @@ export class FunctionsComponent implements OnInit, OnDestroy {
     private notificationService: NotificationService,
     private utilitiesService: UtilitiesService) {
   }
+
+  ngOnDestroy(): void {
+        this.subscription.unsubscribe();
+    }
+
   ngOnInit() {
     this.loadData();
   }
@@ -43,14 +50,13 @@ export class FunctionsComponent implements OnInit, OnDestroy {
     }
 
   }
+
   loadData(selectionId = null) {
     this.blockedPanel = true;
     this.subscription.add(this.functionsService.getAll()
       .subscribe((response: any) => {
         const functionTree = this.utilitiesService.UnflatteringForTree(response);
-        console.log(functionTree);
         this.items = <TreeNode[]>functionTree;
-        console.log(this.selectedItems);
         if (this.selectedItems.length === 0 && this.items.length > 0) {
           this.selectedItems.push(this.items[0]);
           this.loadDataCommand();
@@ -60,9 +66,13 @@ export class FunctionsComponent implements OnInit, OnDestroy {
           this.selectedItems = this.items.filter(x => x.data.id === selectionId);
         }
 
-        setTimeout(() => { this.blockedPanel = false; }, 1000);
+        setTimeout(() => {
+          this.blockedPanel = false;
+        }, 1000);
       }, error => {
-        setTimeout(() => { this.blockedPanel = false; }, 1000);
+        setTimeout(() => {
+          this.blockedPanel = false;
+        }, 1000);
       }));
   }
 
@@ -73,11 +83,11 @@ export class FunctionsComponent implements OnInit, OnDestroy {
         backdrop: 'static'
       });
 
-    this.bsModalRef.content.saved.subscribe(response => {
+    this.subscription.add(this.bsModalRef.content.saved.subscribe(response => {
       this.bsModalRef.hide();
       this.loadData();
       this.selectedItems = [];
-    });
+    }));
   }
 
   showEditModal() {
@@ -96,11 +106,54 @@ export class FunctionsComponent implements OnInit, OnDestroy {
       });
 
 
-    this.bsModalRef.content.saved.subscribe((response) => {
+    this.subscription.add(this.bsModalRef.content.saved.subscribe((response) => {
       this.bsModalRef.hide();
       this.loadData(response.id);
-    });
+    }));
   }
+
+  nodeSelect(event: any) {
+    this.selectedCommandItems = [];
+    this.commands = [];
+    if (this.selectedItems.length === 1 && this.showCommandGrid) {
+      this.loadDataCommand();
+    }
+  }
+
+  nodeUnSelect(event: any) {
+    this.selectedCommandItems = [];
+    this.commands = [];
+    if (this.selectedItems.length === 1 && this.showCommandGrid) {
+      this.loadDataCommand();
+    }
+  }
+
+  deleteItems() {
+    if (this.selectedItems.length === 0) {
+      this.notificationService.showError(MessageConstants.NOT_CHOOSE_ANY_RECORD);
+      return;
+    }
+    const id = this.selectedItems[0].id;
+    this.notificationService.showConfirmation(MessageConstants.CONFIRM_DELETE_MSG,
+      () => this.deleteItemsConfirm(id));
+  }
+
+  deleteItemsConfirm(id: string) {
+    this.blockedPanel = true;
+    this.subscription.add(this.functionsService.delete(id).subscribe(() => {
+      this.notificationService.showSuccess(MessageConstants.DELETED_OK_MSG);
+      this.loadData();
+      this.selectedItems = [];
+      setTimeout(() => {
+        this.blockedPanel = false;
+      }, 1000);
+    }, error => {
+      setTimeout(() => {
+        this.blockedPanel = false;
+      }, 1000);
+    }));
+  }
+
   loadDataCommand() {
     this.blockedPanelCommand = true;
     this.subscription.add(this.functionsService.getAllCommandsByFunctionId(this.selectedItems[0].id)
@@ -115,6 +168,30 @@ export class FunctionsComponent implements OnInit, OnDestroy {
         this.blockedPanelCommand = false;
       }));
   }
+
+  removeCommands() {
+    const selectedCommandIds = [];
+    this.selectedCommandItems.forEach(element => {
+      selectedCommandIds.push(element.id);
+    });
+    this.notificationService.showConfirmation(MessageConstants.CONFIRM_DELETE_MSG,
+      () => this.removeCommandsConfirm(selectedCommandIds));
+  }
+
+  removeCommandsConfirm(ids: string[]) {
+    this.blockedPanelCommand = true;
+    const entity = new CommandAssign();
+    entity.commandIds = ids;
+    this.subscription.add(this.functionsService.deleteCommandsFromFunction(this.selectedItems[0].id, entity).subscribe(() => {
+      this.loadDataCommand();
+      this.selectedCommandItems = [];
+      this.notificationService.showSuccess(MessageConstants.DELETED_OK_MSG);
+      this.blockedPanelCommand = false;
+    }, error => {
+      this.blockedPanelCommand = false;
+    }));
+  }
+
   addCommandsToFunction() {
     if (this.selectedItems.length === 0) {
       this.notificationService.showError(MessageConstants.NOT_CHOOSE_ANY_RECORD);
@@ -132,70 +209,8 @@ export class FunctionsComponent implements OnInit, OnDestroy {
       });
     this.subscription.add(this.bsModalRef.content.chosenEvent.subscribe((response: any[]) => {
       this.bsModalRef.hide();
-      this.loadData();
-      this.selectedItems = [];
-    }));
-  }
-
-  removeCommands() {
-    const selectCommandIds = [];
-    this.selectedItems.forEach( element => {
-      selectCommandIds.push(element.id);
-    });
-    this.notificationService.showConfirmation(MessageConstants.CONFIRM_DELETE_MSG,
-      () => this.removeCommandsConfirm(selectCommandIds));
-  }
-  removeCommandsConfirm(ids: string[]) {
-    this.blockedPanelCommand = true;
-    const entity = new CommandAssign();
-    entity.commandIds = ids;
-    this.functionsService.deleteCommandsFromFunction(this.selectedItems[0].id, entity).subscribe(() => {
       this.loadDataCommand();
       this.selectedCommandItems = [];
-      this.notificationService.showSuccess(MessageConstants.DELETED_OK_MSG);
-      this.blockedPanelCommand = false;
-    }, error => {
-      this.blockedPanelCommand = false;
-    });
-  }
-
-  deleteItems() {
-    if (this.selectedItems.length === 0) {
-      this.notificationService.showError(MessageConstants.NOT_CHOOSE_ANY_RECORD);
-      return;
-    }
-    const id = this.selectedItems[0].id;
-    this.notificationService.showConfirmation(MessageConstants.CONFIRM_DELETE_MSG,
-      () => this.deleteItemsConfirm(id));
-  }
-  deleteItemsConfirm(id: string) {
-    this.blockedPanel = true;
-    this.functionsService.delete(id).subscribe(() => {
-      this.notificationService.showSuccess(MessageConstants.DELETED_OK_MSG);
-      this.loadData();
-      this.selectedItems = [];
-      setTimeout(() => { this.blockedPanel = false; }, 1000);
-    }, error => {
-      setTimeout(() => { this.blockedPanel = false; }, 1000);
-    });
-  }
-  nodeSelect(event: any) {
-    this.selectedCommandItems = [];
-    this.commands = [];
-    if (this.selectedItems.length === 1 && this.showCommandGrid) {
-      this.loadDataCommand();
-    }
-  }
-
-  nodeUnSelect(event: any) {
-    this.selectedCommandItems = [];
-    this.commands = [];
-    if (this.selectedItems.length === 1 && this.showCommandGrid) {
-      this.loadDataCommand();
-    }
-  }
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+    }));
   }
 }
-
