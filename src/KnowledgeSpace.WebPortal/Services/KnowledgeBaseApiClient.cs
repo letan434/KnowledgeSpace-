@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using KnowledgeSpace.ViewModels;
 using KnowledgeSpace.ViewModels.Contents;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
@@ -22,6 +23,16 @@ namespace KnowledgeSpace.WebPortal.Services
             _httpClientFactory = httpClientFactory;
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor; 
+        }
+
+        public async Task<Pagination<KnowledgeBaseQuickVm>> GetKnowledgeBaseByCategoryId(int categoryId, int pageIndex, int pageSize)
+        {
+            var apiUrl = $"/api/knowledgeBases/filter?categoryId={categoryId}&pageIndex={pageIndex}&pageSize={pageSize}";
+            var client = _httpClientFactory.CreateClient();
+            client.BaseAddress = new Uri(_configuration["BackendApiUrl"]);
+            var response = await client.GetAsync(apiUrl);
+            var knowledBases = JsonConvert.DeserializeObject<Pagination<KnowledgeBaseQuickVm>>(await response.Content.ReadAsStringAsync());
+            return knowledBases;
         }
 
         public async Task<List<KnowledgeBaseQuickVm>> GetLatestKnowledgeBases(int take)
