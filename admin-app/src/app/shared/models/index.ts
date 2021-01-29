@@ -11,3 +11,8 @@ export * from './permission.model';
 export * from './permission-update-request';
 export * from './category.model';
 export * from './knowledge-base.model';
+export * from './comment.model';
+export * from  './report.model';
+export * from './monthly-new-comment.model';
+export * from './monthly-new-member.model';
+export * from './monthly-new-kb.model';

@@ -1,8 +1,89 @@
-﻿@{
+﻿@model HomeViewModel
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<div class="container">
+    <div class="row">
+        <!-- start of page content -->
+        <div class="span8 page-content">
+
+            <!-- Basic Home Page Template -->
+            <div class="row separator">
+                <section class="span4 articles-list">
+                    <h3>Bai viet xem nhieu nhat </h3>
+                    <ul class="articles">
+                        @foreach (var item in Model.PopularKnowledgeBases)
+                        {
+                            var url = "/kb/" + item.SeoAlias + "-" + item.Id + "/";
+                            <li class="article-entry standard">
+                                <h4><a href="@url">@Html.Raw(item.Title)</a></h4>
+                                <span class="article-meta">@item.CreateDate.ToString("dd/MM/yyyy") trong
+                                <a href="/cat/@item.CategoryAlias-@item.CategoryId" title="xem tat ca bai dang trong @item.CategoryName">@item.CategoryName</a></span>
+                                <span class="like-count">@item.NumberOfVotes</span>
+                            </li>
+                        }
+
+                    </ul>
+                </section>
+
+
+                <section class="span4 articles-list">
+                    <h3>Bai dang gan nhat</h3>
+                    <ul class="articles">
+                        @foreach (var item in Model.LatestKnowledgeBases)
+                        {
+                            var url = "/kb/" + item.SeoAlias + "-" + item.Id + "/";
+                            <li class="article-entry standard">
+                                <h4><a href="@url">@Html.Raw(item.Title)</a></h4>
+                                <span class="article-meta">
+                                    @item.CreateDate.ToString("dd/MM/yyyy") trong
+                                <a href="/cat/@item.CategoryAlias-@item.CategoryId" title="xem tat ca bai dang trong @item.CategoryName">@item.CategoryName</a>
+                            </span>
+                            <span class="like-count">@item.NumberOfVotes</span>
+                        </li>
+                    }
+
+                    </ul>
+                </section>
+            </div>
+        </div>
+        <!-- end of page content -->
+        <!-- start of sidebar -->
+        <aside class="span4 page-sidebar">
+
+            <section class="widget">
+                <div class="support-widget">
+                    <h3 class="title">Support</h3>
+                    <p class="intro">Need more support? If you did not found an answer, contact us for further help.</p>
+                </div>
+            </section>
+
+            <section class="widget">
+                <div class="quick-links-widget">
+                    <h3 class="title">Quick Links</h3>
+                    <ul id="menu-quick-links" class="menu clearfix">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="articles-list.html">Articles List</a></li>
+                        <li><a href="faq.html">FAQs</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="widget">
+                <h3 class="title">Tags</h3>
+                <div class="tagcloud">
+                     @foreach (var item in Model.PopularLabels)
+                        {
+                           <a href="tag/@item.Id" class="btn btn-mini">
+                               @Html.Raw(item.Name);
+                           </a>
+                        }
+                </div>
+            </section>
+
+        </aside>
+        <!-- end of sidebar -->
+    </div>
+</div> 

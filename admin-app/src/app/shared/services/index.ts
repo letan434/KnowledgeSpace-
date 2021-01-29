@@ -8,3 +8,7 @@ export * from './function.service';
 export * from './notification.service';
 export * from  './categories.service';
 export * from  './knowledge-bases.service';
+export * from './comments.service';
+export * from './reports.service';
+export * from './statistics.service';
+

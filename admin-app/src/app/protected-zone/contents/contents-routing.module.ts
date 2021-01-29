@@ -71,7 +71,24 @@ const routes: Routes = [
             functionCode: 'CONTENT_REPORT'
         },
         canActivate: [AuthGuard]
+    },
+    {
+        path: 'knowledge-bases/:knowledgeBaseId/comments',
+        component: CommentsComponent,
+        data: {
+            functionCode: 'CONTENT_COMMENT'
+        },
+        canActivate: [AuthGuard]
+    },
+    {
+        path: 'knowledge-bases/comments',
+        component: CommentsComponent,
+        data: {
+            functionCode: 'CONTENT_COMMENT'
+        },
+        canActivate: [AuthGuard]
     }
+
 ];
 
 @NgModule({

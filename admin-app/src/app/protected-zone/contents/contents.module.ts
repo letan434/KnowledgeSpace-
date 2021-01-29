@@ -22,6 +22,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ValidationMessageModule } from '@app/shared/modules/validation-message/validation-message.module';
 import { BsModalService, ModalModule } from 'ngx-bootstrap/modal';
 import { NotificationService } from '@app/shared/services';
+import { CommentsDetailComponent } from './comments/comments-detail/comments-detail.component';
+import { ReportsDetailComponent } from './reports/reports-detail/reports-detail.component';
 
 
 
@@ -33,6 +35,8 @@ import { NotificationService } from '@app/shared/services';
     ReportsComponent,
     KnowledgeBasesDetailComponent,
     CategoriesDetailComponent,
+    CommentsDetailComponent,
+    ReportsDetailComponent,
 
   ],  imports: [
     CommonModule,
