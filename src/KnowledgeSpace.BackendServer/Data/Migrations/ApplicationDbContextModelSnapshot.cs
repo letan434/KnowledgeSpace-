@@ -291,6 +291,9 @@ namespace KnowledgeSpace.BackendServer.Data.Migrations
                         .HasColumnType("nvarchar(500)")
                         .HasMaxLength(500);
 
+                    b.Property<int?>("ViewCount")
+                        .HasColumnType("int");
+
                     b.Property<string>("Workaround")
                         .HasColumnType("nvarchar(500)")
                         .HasMaxLength(500);

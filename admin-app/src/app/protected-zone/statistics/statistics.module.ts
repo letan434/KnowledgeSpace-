@@ -8,6 +8,7 @@ import { PaginatorModule } from 'primeng/paginator';
 import { PanelModule } from 'primeng/panel';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
+import { BlockUIModule, InputTextModule, ProgressSpinnerModule } from 'primeng';
 
 
 
@@ -19,7 +20,10 @@ import { TableModule } from 'primeng/table';
     PaginatorModule,
     PanelModule,
     ButtonModule,
-    TableModule
+    TableModule,
+    BlockUIModule,
+    InputTextModule,
+    ProgressSpinnerModule
   ]
 })
 export class StatisticsModule { }

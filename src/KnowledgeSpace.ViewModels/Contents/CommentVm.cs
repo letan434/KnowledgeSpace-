@@ -14,6 +14,8 @@ namespace KnowledgeSpace.ViewModels.Contents
 
         public string OwnwerUserId { get; set; }
 
+        public string OwnwerName { get; set; }
+
         public DateTime CreateDate { get; set; }
 
         public DateTime? LastModifiedDate { get; set; }
